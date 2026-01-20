@@ -35,6 +35,5 @@ Key components:
 After acceptance, this repository will include:
 - Full training and inference code
 - Data preparation scripts
-- Pre-trained checkpoints
 - Reproducibility configs and instructions
 - (Optional) evaluation scripts and logs

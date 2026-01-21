@@ -1,4 +1,4 @@
-#DBMIF: A Deep Balanced Multi-modal Iterative Fusion Framework for Air- and Bone-Conduction Speech Enhancement
+# DBMIF: A Deep Balanced Multi-modal Iterative Fusion Framework for Air- and Bone-Conduction Speech Enhancement
 This repository is the official project page for **DBMIF**, a framework for audio (AC) and bone-conduction (BC) based speech enhancement with iterative fusion and balanced interaction.
 
 > **Code release plan:**  

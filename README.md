@@ -8,12 +8,10 @@ This repository contains the training, inference, and evaluation code for **DBMI
 
 - **Title:** *DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement*
 - **Authors:** Yilei Wu, Changyan Zheng, Xingyu Zhang, Yakun Zhang, Chengshi Zheng, Shuang Yang, Ye Yan, Erwei Yin
-- **Status:** Accepted by *Applied Intelligence*
-- **Preprint:** [arXiv:2603.02877](https://arxiv.org/abs/2603.02877)
-- **arXiv DOI:** [10.48550/arXiv.2603.02877](https://doi.org/10.48550/arXiv.2603.02877)
-- **Submitted to arXiv:** March 3, 2026
-
-The public journal page with final volume / issue / page information does not appear to be online yet, so the arXiv record is currently the most complete public metadata source.
+- **Journal:** *Applied Intelligence*
+- **Published:** March 18, 2026
+- **Volume / Article:** Volume 56, Article 165
+- **DOI:** [10.1007/s10489-026-07150-z](https://link.springer.com/article/10.1007/s10489-026-07150-z)
 
 ---
 
@@ -140,13 +138,13 @@ If these are not installed, the ASR step in the test pipeline will fail even if 
 ## Citation
 
 ```bibtex
-@misc{wu2026dbmif,
+@article{wu2026dbmif,
   title         = {DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement},
   author        = {Yilei Wu and Changyan Zheng and Xingyu Zhang and Yakun Zhang and Chengshi Zheng and Shuang Yang and Ye Yan and Erwei Yin},
+  journal       = {Applied Intelligence},
+  volume        = {56},
+  pages         = {165},
   year          = {2026},
-  eprint        = {2603.02877},
-  archivePrefix = {arXiv},
-  primaryClass  = {eess.AS},
-  doi           = {10.48550/arXiv.2603.02877}
+  doi           = {10.1007/s10489-026-07150-z}
 }
 ```

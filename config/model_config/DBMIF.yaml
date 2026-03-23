@@ -1,0 +1,91 @@
+model:
+  name: ACBC
+  generator:
+    name: TriGenerator
+    m: 4
+    n: 32
+    pa: 4
+    pb: 4
+    channel_list:
+      - 32
+      - 64
+      - 128
+      - 256
+    stride_list:
+      - 2
+      - 4
+      - 8
+    bridge:
+      method: skip
+      fusion: gateatt
+    last_bridge_ac:
+      method: pconv
+      fusion: pointwise
+    last_bridge_bc:
+      method: skip
+      fusion: pointwise
+    last_bridge_fusion:
+      method: none
+    block: 
+      method: residualblock
+      num_layers: 3 
+      dilation: 3**layer 
+    fusion:
+      method: gateconv
+    latent_fusion:
+      method: auto
+      stop_mod: abs
+      fsolver: broyden
+      fblock_type: middlegatedaddblock
+      fthresh: 50
+      bsolver: broyden
+      bblock_type: deqfusionblock
+      bthresh: 49
+      residual: true
+    
+  discriminator:
+    name: Discriminator
+    q: 4
+    auto_fit_channels: true
+  lr: 0.0003
+  betas:
+    - 0.5
+    - 0.9
+  scheduler: cosine
+
+metrics:
+  train_metrics:
+    mse:
+      name: MeanSquaredError
+  val_metrics:
+    mse:
+      name: MeanSquaredError
+    si_sdr:
+      name: ScaleInvariantSignalDistortionRatio
+    stoi:
+      name: ShortTimeObjectiveIntelligibility
+      params:
+        fs: 16000
+    pesq:
+      name: PerceptualEvaluationSpeechQuality
+      params:
+        fs: 16000
+        mode: wb
+
+  test_metrics:
+    mse:
+      name: MeanSquaredError
+    si_sdr:
+      name: ScaleInvariantSignalDistortionRatio
+    stoi:
+      name: ShortTimeObjectiveIntelligibility
+      params:
+        fs: 16000
+    pesq:
+      name: PerceptualEvaluationSpeechQuality
+      params:
+        fs: 16000
+        mode: wb
+
+trainer:
+  check_val_every_n_epoch: 10

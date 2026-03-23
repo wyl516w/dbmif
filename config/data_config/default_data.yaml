@@ -1,0 +1,38 @@
+datamodule:
+  name: ab+noise
+  ab_datamodule:
+    name: ab
+    path_to_dataset: ./dataset/abdata/ABCS_database
+    sr_standard: 16000
+    len_seconds_train: 1
+    len_seconds_val: 1
+    len_seconds_test: 1
+    is_smoothing: true
+  noise_datamodule:
+    name: noise
+    path_to_dataset: ./dataset/noisedata
+    sr_standard: 16000
+    train_name:
+      - datasets_fullband/*
+      - EnvironmentalBackgroundNoise/*
+    val_name:
+      - NoiseX-92/*
+    test_name:
+      - NoiseX-92/*
+    keep_data_in_memory: false
+  is_smoothing: true
+  snr:
+    - interval
+    - -15
+    - 5
+  test_snr:
+    - -15
+    - -5
+    - 5
+  bs_train: 2
+  bs_val: 2
+  num_workers: 8
+  ratio: 2
+  keep_clean_data: false
+  pin_memory: false
+  persistent_workers: true

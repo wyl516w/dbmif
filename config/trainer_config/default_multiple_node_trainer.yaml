@@ -1,0 +1,29 @@
+
+trainer:
+  num_nodes: 2
+  strategy: ddp
+  accelerator: auto
+  max_epochs: 200
+  enable_checkpointing: true
+  enable_progress_bar: true
+  check_val_every_n_epoch: 10
+  log_every_n_steps: 1
+  logger:
+    save_dir: ./logs
+    name: default
+    version: null
+
+  # callbacks:
+  # - name: pytorch_lightning.callbacks.ModelCheckpoint
+  #   dirpath: ./checkpoints/default
+  #   monitor: epoch
+  #   mode: max
+  #   save_top_k: 10
+  #   save_last: true
+  #   filename: checkpoint-{epoch:04d}
+  #   enable_version_counter: true
+
+checkpoint: null
+continue_training: false
+train: true
+test: true

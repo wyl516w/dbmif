@@ -1,0 +1,40 @@
+model:
+  name: DenseConnetCRN
+  casual: true
+
+metrics:
+  train_metrics:
+    mse:
+      name: MeanSquaredError
+  val_metrics:
+    mse:
+      name: MeanSquaredError
+    si_sdr:
+      name: ScaleInvariantSignalDistortionRatio
+    stoi:
+      name: ShortTimeObjectiveIntelligibility
+      params:
+        fs: 16000
+    pesq:
+      name: PerceptualEvaluationSpeechQuality
+      params:
+        fs: 16000
+        mode: wb
+  test_metrics:
+    mse:
+      name: MeanSquaredError
+    si_sdr:
+      name: ScaleInvariantSignalDistortionRatio
+    stoi:
+      name: ShortTimeObjectiveIntelligibility
+      params:
+        fs: 16000
+    pesq:
+      name: PerceptualEvaluationSpeechQuality
+      params:
+        fs: 16000
+        mode: wb
+
+trainer:
+  check_val_every_n_epoch: 1
+  log_every_n_steps: 1

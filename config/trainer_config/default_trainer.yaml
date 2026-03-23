@@ -1,0 +1,33 @@
+
+trainer:
+  num_nodes: 1
+  # strategy: ddp_find_unused_parameters_true
+  accelerator: auto
+  strategy: auto
+  devices: 1
+  max_epochs: 100
+  enable_checkpointing: true
+  check_val_every_n_epoch: 20
+  log_every_n_steps: 1
+  logger:
+    save_dir: ./logs
+    name: default
+    version: null
+  precision: 32
+    #accumulate_grad_batches: 2
+
+  # callbacks:
+  # - name: pytorch_lightning.callbacks.ModelCheckpoint
+  #   dirpath: ./checkpoints/default
+  #   monitor: epoch
+  #   mode: max
+  #   save_top_k: 10
+  #   save_last: true
+  #   filename: checkpoint-{epoch:04d}
+  #   enable_version_counter: true
+
+# resume_from_checkpoint: /home/wuyilei/code/dbmif_abcs/logs/collection/DBMIF-2025-09-29_20-37-46/version_0/checkpoints/epoch=79-step=199200.ckpt
+resume_from_checkpoint:  checkpoints\Proposed-epoch=99-step=249000.ckpt
+    # continue_training: true
+train: true
+test: false

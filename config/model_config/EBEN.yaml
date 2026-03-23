@@ -1,0 +1,36 @@
+model:
+  name: OnlyBC
+  generator:
+    name: GeneratorDBMIF
+    m: 4
+    n: 32
+  discriminator:
+    name: Discriminator
+    q: 3
+    auto_fit_channels: true
+  lr: 0.0003
+  betas:
+    - 0.5
+    - 0.9
+
+metrics:
+  train_metrics:
+    mse:
+      name: MeanSquaredError
+  val_metrics:
+    mse:
+      name: MeanSquaredError
+  test_metrics:
+    mse:
+      name: MeanSquaredError
+    si_sdr:
+      name: ScaleInvariantSignalDistortionRatio
+    stoi:
+      name: ShortTimeObjectiveIntelligibility
+      params:
+        fs: 16000
+    pesq:
+      name: PerceptualEvaluationSpeechQuality
+      params:
+        fs: 16000
+        mode: wb

@@ -1,0 +1,276 @@
+""" DBMIF discriminators and sub blocks definition in Pytorch"""
+
+import torch
+from torch import nn
+
+class DiscriminatorDBMIFMultiScales(nn.Module):
+    """
+    Multi-scales discriminators of composed of 3 scales pqmf discriminators refining q bands and one 1 full scale Melgan
+
+    Args:
+        q: The number of PMQF bands sent to the discriminators to be refined
+    """
+
+    def __init__(self, q: int = 3, auto_fit_channels: bool = False):
+        super().__init__()
+
+        self.q = q
+        
+        self.auto_fit_channels = auto_fit_channels
+
+        # PQMF discriminators
+        self.pqmf_discriminators = torch.nn.ModuleList()
+
+        # having multiple dilation helps to focus on multiscale structure of bands
+        for dila in [1, 2, 3]:
+            self.pqmf_discriminators.append(DiscriminatorDBMIF(dilation=dila, q=q, auto_fit_channels=auto_fit_channels))
+
+        # MelGAN discriminator
+        self.melgan_discriminator = DiscriminatorMelGAN()
+
+
+    def forward(self, bands, audio):
+        """
+        Forward pass of the DBMIF discriminators module.
+
+        Args:
+            bands (torch.Tensor): PQMF bands
+            audio (torch.Tensor): corresponding speech signal
+
+        Returns:
+            embeddings (List[List[torch.Tensor]]): a list of all embeddings layers of all discriminators
+        """
+        embeddings = []
+
+        for dis in self.pqmf_discriminators:
+            embeddings.append(dis(bands))
+
+        embeddings.append(self.melgan_discriminator(audio))
+
+        return embeddings
+
+
+class DiscriminatorDBMIF(nn.Module):
+    """
+    DBMIF PQMF-bands discriminator
+    """
+
+    def __init__(self, dilation=1, q: int = 4, base: int = 36, auto_fit_channels: bool = False):
+        super().__init__()
+        self.dilation = dilation
+        if not auto_fit_channels:
+            assert math.gcd(q, base) == q , f"q ({q}) must divide base ({base})"
+            groups = q
+        else:
+            import math
+            groups = math.gcd(q,base)
+
+        self.discriminator = nn.ModuleList(
+            [
+                nn.Sequential(
+                    nn.ReflectionPad1d(1),
+                    normalized_conv1d(
+                        q,
+                        base,
+                        kernel_size=(3,),
+                        stride=(1,),
+                        padding=(1,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        base,
+                        base * 2,
+                        kernel_size=(7,),
+                        stride=(2,),
+                        padding=(3,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        base * 2,
+                        base * 4,
+                        kernel_size=(7,),
+                        stride=(2,),
+                        padding=(3,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        base * 4,
+                        base * 8,
+                        kernel_size=(7,),
+                        stride=(2,),
+                        padding=(3,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        base * 8,
+                        base*16,
+                        kernel_size=(7,),
+                        stride=(2,),
+                        padding=(3,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        base*16,
+                        base*32,
+                        kernel_size=(7,),
+                        stride=(2,),
+                        padding=(3,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        base*32,
+                        base*32,
+                        kernel_size=(5,),
+                        stride=(1,),
+                        padding=(2,),
+                        dilation=self.dilation,
+                        groups=groups,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                normalized_conv1d(base*32, 1, kernel_size=(3,), stride=(1,), padding=(1,), groups=1),
+            ]
+        )
+
+    def forward(self, bands):
+        embeddings = [bands]
+        for module in self.discriminator:
+            embeddings.append(module(embeddings[-1]))
+        return embeddings
+
+
+class DiscriminatorMelGAN(nn.Module):
+    """
+    MelGAN Discriminator
+     inspired from https://github.com/seungwonpark/melgan/blob/master/model/discriminator.py
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        self.discriminator = nn.ModuleList(
+            [
+                nn.Sequential(
+                    nn.ReflectionPad1d(7),
+                    normalized_conv1d(
+                        in_channels=1, out_channels=16, kernel_size=(15,), stride=(1,)
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        in_channels=16,
+                        out_channels=64,
+                        kernel_size=(41,),
+                        stride=(4,),
+                        padding=20,
+                        groups=4,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        in_channels=64,
+                        out_channels=256,
+                        kernel_size=(41,),
+                        stride=(4,),
+                        padding=20,
+                        groups=4,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        in_channels=256,
+                        out_channels=1024,
+                        kernel_size=(41,),
+                        stride=(4,),
+                        padding=20,
+                        groups=4,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        in_channels=1024,
+                        out_channels=1024,
+                        kernel_size=(41,),
+                        stride=(4,),
+                        padding=20,
+                        groups=4,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                nn.Sequential(
+                    normalized_conv1d(
+                        in_channels=1024,
+                        out_channels=1024,
+                        kernel_size=(5,),
+                        stride=(1,),
+                        padding=2,
+                    ),
+                    nn.LeakyReLU(0.2),
+                ),
+                normalized_conv1d(
+                    in_channels=1024, out_channels=1, kernel_size=3, stride=1, padding=1
+                ),
+            ]
+        )
+
+    def forward(self, audio):
+        embeddings = [audio]
+        for module in self.discriminator:
+            embeddings.append(module(embeddings[-1]))
+        return embeddings
+
+
+def normalized_conv1d(*args, **kwargs):
+    return nn.utils.parametrizations.weight_norm(nn.Conv1d(*args, **kwargs))
+
+
+if __name__ == "__main__":
+    # Instantiate nn.modules
+    dis_bands = DiscriminatorDBMIF()
+    dis_melgan = DiscriminatorMelGAN()
+    dis_ms = DiscriminatorDBMIFMultiScales()
+
+    # Instantiate tensors with shape: (batch_size, channel, time_len)
+    pqmf_bands = torch.randn((5, 3, 1500))
+    speech = torch.randn((5, 1, 60000))
+
+    # Test forward of models
+    scores_bands = dis_bands(bands=pqmf_bands)
+    scores_melgan = dis_melgan(audio=speech)
+    scores_ms = dis_ms(bands=pqmf_bands, audio=speech)
+
+    # Number of parameters
+    bands_params = sum(p.numel() for p in dis_bands.parameters())
+    melgan_params = sum(p.numel() for p in dis_melgan.parameters())
+    ms_params = sum(p.numel() for p in dis_ms.parameters())
+    print(f"DiscriminatorDBMIF has {bands_params * 1e-6:.2f} M parameters")
+    print(f"DiscriminatorMelGAN has {melgan_params * 1e-6:.2f} M parameters")
+    print(f"DiscriminatorDBMIFMultiScales has {ms_params * 1e-6:.2f} M parameters")

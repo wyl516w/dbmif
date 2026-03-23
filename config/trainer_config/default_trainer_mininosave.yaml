@@ -1,0 +1,16 @@
+
+trainer:
+  num_nodes: 1
+  max_epochs: 500
+  enable_checkpointing: true
+  check_val_every_n_epoch: 10
+  log_every_n_steps: 1
+  enable_progress_bar: false
+  logger:
+    save_dir: ./logs/miniexp
+    name: default
+    version: null
+
+checkpoint: null
+train: true
+test: true

@@ -2,23 +2,18 @@
 
 This repository contains the training, inference, and evaluation code for **DBMIF**, a multi-modal speech enhancement framework that combines **air-conduction (AC)** and **bone-conduction (BC)** signals through iterative fusion.
 
-The project currently includes:
-
-- training entry scripts for Linux and Windows
-- unified testing, inference, metric, and ASR evaluation scripts
-- model configuration files for DBMIF and several baselines
-- data module definitions for AC, BC, and noise fusion
-- core model implementations for `ACBC`, `OnlyAC`, `OnlyBC`, and comparison models
-
 ---
 
 ## Paper
 
 - **Title:** *DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement*
-- **Venue:** *Applied Intelligence* (Accept)
-- **Project page / PDF:** *TBD*
+- **Authors:** Yilei Wu, Changyan Zheng, Xingyu Zhang, Yakun Zhang, Chengshi Zheng, Shuang Yang, Ye Yan, Erwei Yin
+- **Status:** Accepted by *Applied Intelligence*
+- **Preprint:** [arXiv:2603.02877](https://arxiv.org/abs/2603.02877)
+- **arXiv DOI:** [10.48550/arXiv.2603.02877](https://doi.org/10.48550/arXiv.2603.02877)
+- **Submitted to arXiv:** March 3, 2026
 
-If you use this repository, please cite the paper. The citation block can be updated once the final publication metadata is available.
+The public journal page with final volume / issue / page information does not appear to be online yet, so the arXiv record is currently the most complete public metadata source.
 
 ---
 
@@ -89,78 +84,35 @@ If your local dataset paths differ, update the YAML files before training or tes
 
 ---
 
-## Training
+## Entry Points
 
-### Linux
+Training:
 
-```bash
-bash train.sh
-```
+- Linux: `train.sh`
+- Windows PowerShell: `train.ps1`
+- Windows CMD: `train.bat`
 
-### Windows PowerShell
+Testing:
 
-```powershell
-.\train.ps1 --dry-run --skip-gpu-check
-.\train.ps1 --skip-gpu-check
-```
+- Linux: `test.sh`
+- Windows PowerShell: `test.ps1`
+- Windows CMD: `test.bat`
 
-### Windows CMD
-
-```bat
-train.bat --dry-run --skip-gpu-check
-train.bat --skip-gpu-check
-```
-
-The default training entry is `main.py`, which merges:
-
-- data config
-- trainer config
-- model config
-- optional extra overrides from command-line arguments
-
-The default model config is `config/model_config/DBMIF.yaml`.
+The default training config is `config/model_config/DBMIF.yaml`, and the default test output directory is `./results`.
 
 ---
 
-## Testing and Evaluation
+## Evaluation
 
-The unified test pipeline performs:
+The unified test pipeline covers:
 
 1. inference
-2. reference text generation
-3. objective metric computation
+2. reference generation
+3. objective metrics
 4. ASR transcription
 5. CER calculation
 
-### Linux
-
-```bash
-bash test.sh DBMIF
-```
-
-### Windows PowerShell
-
-```powershell
-.\test.ps1 DBMIF --dry-run
-.\test.ps1 DBMIF
-```
-
-### Windows CMD
-
-```bat
-test.bat DBMIF --dry-run
-test.bat DBMIF
-```
-
-The default output directory is `./results`.
-
-If you want to test a different model or provide custom files:
-
-```powershell
-.\test.ps1 GaGNet --config .\config\model_config\GaGNet.yaml --ckpt path\to\model.ckpt
-```
-
-Testing helper scripts live under `scripts/test`.
+Supporting scripts are located in `scripts/test`.
 
 ---
 
@@ -188,10 +140,13 @@ If these are not installed, the ASR step in the test pipeline will fail even if 
 ## Citation
 
 ```bibtex
-@article{dbmif2026,
-  title   = {DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement},
-  author  = {To be updated},
-  journal = {Applied Intelligence},
-  year    = {2026}
+@misc{wu2026dbmif,
+  title         = {DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement},
+  author        = {Yilei Wu and Changyan Zheng and Xingyu Zhang and Yakun Zhang and Chengshi Zheng and Shuang Yang and Ye Yan and Erwei Yin},
+  year          = {2026},
+  eprint        = {2603.02877},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.AS},
+  doi           = {10.48550/arXiv.2603.02877}
 }
 ```

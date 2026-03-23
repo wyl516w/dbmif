@@ -1,150 +1,64 @@
 # DBMIF: A Deep Balanced Multi-modal Iterative Fusion Framework for Air- and Bone-Conduction Speech Enhancement
 
-This repository contains the training, inference, and evaluation code for **DBMIF**, a multi-modal speech enhancement framework that combines **air-conduction (AC)** and **bone-conduction (BC)** signals through iterative fusion.
-
----
-
 ## Paper
 
 - **Title:** *DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement*
 - **Authors:** Yilei Wu, Changyan Zheng, Xingyu Zhang, Yakun Zhang, Chengshi Zheng, Shuang Yang, Ye Yan, Erwei Yin
 - **Journal:** *Applied Intelligence*
 - **Published:** March 18, 2026
-- **Volume / Article:** Volume 56, Article 165
 - **DOI:** [10.1007/s10489-026-07150-z](https://link.springer.com/article/10.1007/s10489-026-07150-z)
 
----
+## Key Points
 
-## Overview
+- DBMIF targets speech enhancement in extremely low-SNR conditions by jointly using **air-conduction (AC)** and **bone-conduction (BC)** signals.
+- The model is built as a **three-branch architecture** on top of a multi-scale interactive encoder-decoder backbone.
+- It combines an **iterative attention module**, a **cross-branch gated module**, and a **balanced-interaction bottleneck** to enable adaptive AC-BC fusion and stable representation learning.
+- Experiments show competitive gains in speech quality and intelligibility across multiple noise conditions, and the method reduces downstream **CER by at least 2.5%** against competing approaches.
 
-DBMIF follows an end-to-end enhancement pipeline built around sub-band analysis and cross-modal interaction:
+## Training
 
-**PQMF Analysis -> Iterative Fusion -> Cross-branch Interaction -> Balanced Refinement -> PQMF Synthesis**
+Set dataset paths in `config/data_config/default_data.yaml`, then run:
 
-The repository currently exposes the following main model-side entry names:
-
-- `ACBC`: the main dual-branch AC/BC enhancement model
-- `OnlyAC`: AC-only variant
-- `OnlyBC`: BC-only variant
-- `GaGNet`, `Conformer`, `DCCRN`, `DenGCAN`, `FCN`, `MMINet`: baseline / comparison models
-
-Available model config files are under `config/model_config`:
-
-- `DBMIF.yaml`
-- `EBEN.yaml`
-- `GaGNet.yaml`
-- `Conformer.yaml`
-- `DCCRN.yaml`
-- `DenGCAN.yaml`
-- `FCN.yaml`
-- `MMINet.yaml`
-
----
-
-## Repository Layout
-
-```text
-dbmif/
-|- config/                 # data / trainer / model YAML configs
-|- module/                 # datamodules, models, metrics, utilities
-|- scripts/
-|  |- test/                # inference, metrics, ASR, CER helpers
-|  |- test.sh              # Linux unified test pipeline
-|  `- test.ps1             # Windows unified test pipeline
-|- dataset/                # dataset placeholders / documentation
-|- main.py                 # training entry
-|- train.sh                # Linux training entry
-|- train.ps1               # Windows training entry
-|- train.bat               # Windows cmd wrapper
-|- test.sh                 # Linux test wrapper
-|- test.ps1                # Windows test wrapper
-`- test.bat                # Windows cmd wrapper
+```bash
+bash train.sh
 ```
 
----
+```powershell
+.\train.ps1 --skip-gpu-check
+```
 
-## Data Layout
+```bat
+train.bat --skip-gpu-check
+```
 
-The default configuration expects:
+Default model config: `config/model_config/DBMIF.yaml`
 
-- AC/BC paired data under `./dataset/abdata/ABCS_database`
-- noise data under `./dataset/noisedata`
+## Testing
 
-The default datamodule configuration is in `config/data_config/default_data.yaml`. It uses:
+Run:
 
-- paired `ab` data
-- `noise` data
-- an `ab+noise` fusion datamodule
-- train SNR sampled from `[-15, 5]`
-- test SNR list `[-15, -5, 5]`
+```bash
+bash test.sh DBMIF
+```
 
-If your local dataset paths differ, update the YAML files before training or testing.
+```powershell
+.\test.ps1 DBMIF
+```
 
----
+```bat
+test.bat DBMIF
+```
 
-## Entry Points
-
-Training:
-
-- Linux: `train.sh`
-- Windows PowerShell: `train.ps1`
-- Windows CMD: `train.bat`
-
-Testing:
-
-- Linux: `test.sh`
-- Windows PowerShell: `test.ps1`
-- Windows CMD: `test.bat`
-
-The default training config is `config/model_config/DBMIF.yaml`, and the default test output directory is `./results`.
-
----
-
-## Evaluation
-
-The unified test pipeline covers:
-
-1. inference
-2. reference generation
-3. objective metrics
-4. ASR transcription
-5. CER calculation
-
-Supporting scripts are located in `scripts/test`.
-
----
-
-## Optional Dependencies
-
-Core training / inference relies on PyTorch, PyTorch Lightning, Torchaudio, TorchMetrics, SoundFile, and YAML-related dependencies.
-
-The ASR stage additionally expects:
-
-- `wenet`
-- `openai-whisper`
-
-If these are not installed, the ASR step in the test pipeline will fail even if enhancement inference itself is available.
-
----
-
-## Notes
-
-- Windows `.ps1` and `.bat` entry scripts are provided alongside the Linux `.sh` scripts.
-- Debug artifacts such as `tmp`, `results`, logs, checkpoints, and cache files are excluded through `.gitignore`.
-- The repository currently tracks code and lightweight dataset placeholders only; full datasets should be prepared locally.
-
----
+Outputs are written to `./results`.
 
 ## Citation
 
 ```bibtex
 @article{wu2026dbmif,
-  title         = {DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement},
-  author        = {Yilei Wu and Changyan Zheng and Xingyu Zhang and Yakun Zhang and Chengshi Zheng and Shuang Yang and Ye Yan and Erwei Yin},
-  journal       = {Applied Intelligence},
-  volume        = {56},
-  pages         = {165},
-  year          = {2026},
-  doi           = {10.1007/s10489-026-07150-z}
+  title   = {DBMIF: a deep balanced multimodal iterative fusion framework for air- and bone-conduction speech enhancement},
+  author  = {Yilei Wu and Changyan Zheng and Xingyu Zhang and Yakun Zhang and Chengshi Zheng and Shuang Yang and Ye Yan and Erwei Yin},
+  journal = {Applied Intelligence},
+  year    = {2026},
+  doi     = {10.1007/s10489-026-07150-z}
 }
 ```
